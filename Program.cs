@@ -1,2 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿var commandLineArgs = Environment.GetCommandLineArgs();
+
+foreach (var arg in commandLineArgs) {
+    Console.WriteLine($"Arg: {arg}");
+}
