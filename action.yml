@@ -1,0 +1,26 @@
+name: github whitelist
+description: 'update github org whitelist based on the current github action nodes'
+author: jpshrader
+inputs:
+  org_slug:
+    description: 'the slug of the github org to run against'
+    required: true
+  token:
+    description: 'github api token'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        repository: jpshrader/github-whitelist
+
+    - name: setup dotnet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+
+    - name: run
+      run: dotnet run ${{ inputs.org_slug }} ${{ inputs.token }}

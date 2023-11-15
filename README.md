@@ -1,6 +1,6 @@
 # Github Whitelist
 
-This tool will call the [GitHub Meta Api](https://docs.github.com/en/free-pro-team@latest/rest/meta/meta?apiVersion=2022-11-28#get-github-meta-information) to determine the current pool of GitBub Actions nodes and their IPs (GitHub updates this pool weekly). The tool will then update your organization's [IP allow list](https://docs.github.com/en/enterprise-cloud@latest/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/managing-allowed-ip-addresses-for-your-organization) with those IPs.
+Using [octokit.net](ctokit.net), this tool will call the [GitHub Meta Api](https://docs.github.com/en/free-pro-team@latest/rest/meta/meta?apiVersion=2022-11-28#get-github-meta-information) to determine the current pool of GitBub Actions nodes and their IPs (GitHub updates this pool weekly). The tool will then update your organization's [IP allow list](https://docs.github.com/en/enterprise-cloud@latest/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/managing-allowed-ip-addresses-for-your-organization) with those IPs.
 
 ### Use Case
 
