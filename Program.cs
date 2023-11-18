@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using Octokit;
+﻿using Octokit;
 
 namespace github_whitelist {
     class Program {

@@ -1,5 +1,5 @@
 # [Choice] .NET version: 6.0, 3.1, 6.0-bullseye, 3.1-bullseye, 6.0-focal, 3.1-focal
-ARG VARIANT="7.0-bullseye-slim"
+ARG VARIANT="8.0-bookwork-slim"
 FROM mcr.microsoft.com/devcontainers/dotnet:${VARIANT}
 
 # [Choice] Node.js version: none, lts/*, 18, 16, 14
