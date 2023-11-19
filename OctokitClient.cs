@@ -4,21 +4,20 @@ using Octokit.GraphQL;
 
 namespace github_whitelist {
     public class OctokitClient {
-        private const string productName = "github-whitelist";
-        private const string productVersion = "0.1.0";
-
-        private const string allowListDescription = "Managed by the GitHub Actions IP Whitelist";
+        private const string PRODUCT_NAME = "github-whitelist";
+        private const string PRODUCT_VERSION = "0.1.0";
+        private const string ALLOWLIST_DESC = "Managed by the GitHub Actions IP Whitelist";
 
         private readonly GitHubClient rest;
         private readonly Octokit.GraphQL.Connection graphQl;
 
         public OctokitClient(string authToken) {
-            var productInfoRest = new Octokit.ProductHeaderValue(productName);
+            var productInfoRest = new Octokit.ProductHeaderValue(PRODUCT_NAME);
             rest = new GitHubClient(productInfoRest){
                 Credentials = new Credentials(authToken)
             };
 
-            var productInfoGraphQl = new Octokit.GraphQL.ProductHeaderValue(productName, productVersion);
+            var productInfoGraphQl = new Octokit.GraphQL.ProductHeaderValue(PRODUCT_NAME, PRODUCT_VERSION);
             graphQl = new Octokit.GraphQL.Connection(productInfoGraphQl, authToken);
         }
 
