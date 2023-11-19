@@ -1,7 +1,4 @@
-﻿using Octokit;
-using Octokit.GraphQL;
-
-namespace github_whitelist {
+﻿namespace github_whitelist {
     class Program {
         static async Task<int> Main(string[] args) {
             if (args.Length < 2) {
@@ -21,32 +18,22 @@ namespace github_whitelist {
                 return -1;
             }
 
-            var productInfoRest = new Octokit.ProductHeaderValue("github-whitelist");
-            var rest = new GitHubClient(productInfoRest){
-                Credentials = new Credentials(token)
-            };
+            var client = new OctokitClient(token);
 
-            Console.WriteLine("fetching github metadata...");
-            var metadata = await rest.Meta.GetMetadata();
-            Console.WriteLine($"found {metadata.Actions.Count} build nodes");
+            var (nodes, nodesNotFound) = await client.GetGitHubActionNodes();
+            if (nodesNotFound) {
+                Console.WriteLine("could not retrieve the github action nodes");
+                return -1;
+            }
 
-            var productInfoGraphQl = new Octokit.GraphQL.ProductHeaderValue("github-whitelist", "0.1.0");
-            var graphQl = new Octokit.GraphQL.Connection(productInfoGraphQl, token);
+            var (allowList, ipListNotFound) = await client.GetIpAllowList(orgSlug);
+            if (ipListNotFound) {
+                Console.WriteLine("could not retrieve the org ip allow list");
+                return -1;
+            }
 
-            var allowListQuery = new Query()
-                .Organization(orgSlug)
-                .IpAllowListEntries(100)
-                .Nodes
-                .Select(entry => new {
-                    entry.Id,
-                    entry.Name,
-                    entry.AllowListValue,
-                    entry.IsActive
-                });
-
-            var response = await graphQl.Run(allowListQuery);
-
-            Console.WriteLine($"found {response.Count()} ips in the allow list");
+            Console.WriteLine($"found {nodes.Count} github action nodes");
+            Console.WriteLine($"found {allowList.Count} entires in the allow list");
             return 0;
         }
     }
