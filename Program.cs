@@ -1,4 +1,5 @@
 ﻿using Octokit;
+using Octokit.GraphQL;
 
 namespace github_whitelist {
     class Program {
@@ -20,25 +21,32 @@ namespace github_whitelist {
                 return -1;
             }
 
-            var client = new GitHubClient(new ProductHeaderValue("github-whitelist")){
+            var productInfoRest = new Octokit.ProductHeaderValue("github-whitelist");
+            var rest = new GitHubClient(productInfoRest){
                 Credentials = new Credentials(token)
             };
 
             Console.WriteLine("fetching github metadata...");
-            var metadata = await client.Meta.GetMetadata();
-            foreach (var node in metadata.Actions) {
-                Console.WriteLine(node);
-            }
+            var metadata = await rest.Meta.GetMetadata();
+            Console.WriteLine($"found {metadata.Actions.Count} build nodes");
 
-            Console.WriteLine("fetching organization...");
-            var org = await client.Organization.Get(orgSlug);
-            if (org is null) {
-                Console.WriteLine($"org not found: {orgSlug}");
-                return -1;
-            }
+            var productInfoGraphQl = new Octokit.GraphQL.ProductHeaderValue("github-whitelist", "0.1.0");
+            var graphQl = new Octokit.GraphQL.Connection(productInfoGraphQl, token);
 
-            Console.WriteLine($"org found: {org.Url}");
+            var allowListQuery = new Query()
+                .Organization(orgSlug)
+                .IpAllowListEntries(100)
+                .Nodes
+                .Select(entry => new {
+                    entry.Id,
+                    entry.Name,
+                    entry.AllowListValue,
+                    entry.IsActive
+                });
 
+            var response = await graphQl.Run(allowListQuery);
+
+            Console.WriteLine($"found {response.Count()} ips in the allow list");
             return 0;
         }
     }
