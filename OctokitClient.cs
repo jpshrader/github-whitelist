@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Octokit;
 using Octokit.GraphQL;
 
@@ -21,18 +22,18 @@ namespace github_whitelist {
             graphQl = new Octokit.GraphQL.Connection(productInfoGraphQl, authToken);
         }
 
-        public async Task<(List<string> nodes, bool notFound)> GetGitHubActionNodes() {
+        public async Task<(IImmutableList<string> nodes, Error? error)> GetGitHubActionNodes() {
             var metadata = await rest.Meta.GetMetadata();
 
             var response = metadata.Actions;
             if (response is null) {
-                return (Enumerable.Empty<string>().ToList(), true);
+                return (Enumerable.Empty<string>().ToImmutableList(), new NotFoundError("github action nodes"));
             }
 
-            return (response.ToList(), false);
+            return (response.ToImmutableList(), null);
         }
 
-        public async Task<(List<AllowedIp> allowList, bool notFound)> GetIpAllowList(string orgSlug) {
+        public async Task<(IImmutableList<AllowedIp> allowList, Error? error)> GetIpAllowList(string orgSlug) {
             var allowListQuery = new Query()
                 .Organization(orgSlug)
                 .IpAllowListEntries(100)
@@ -46,10 +47,10 @@ namespace github_whitelist {
 
             var response = await graphQl.Run(allowListQuery);
             if (response is null) {
-                return (Enumerable.Empty<AllowedIp>().ToList(), true);
+                return (Enumerable.Empty<AllowedIp>().ToImmutableList(), new NotFoundError("ip allow list"));
             }
 
-            return (response.ToList(), false);
+            return (response.ToImmutableList(), null);
         }
     }
 

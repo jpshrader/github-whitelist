@@ -20,15 +20,15 @@
 
             var client = new OctokitClient(token);
 
-            var (nodes, nodesNotFound) = await client.GetGitHubActionNodes();
-            if (nodesNotFound) {
-                Console.WriteLine("could not retrieve the github action nodes");
+            var (nodes, nodeErr) = await client.GetGitHubActionNodes();
+            if (nodeErr is not null) {
+                Console.WriteLine(nodeErr);
                 return -1;
             }
 
-            var (allowList, ipListNotFound) = await client.GetIpAllowList(orgSlug);
-            if (ipListNotFound) {
-                Console.WriteLine("could not retrieve the org ip allow list");
+            var (allowList, ipListErr) = await client.GetIpAllowList(orgSlug);
+            if (ipListErr is not null) {
+                Console.WriteLine(ipListErr);
                 return -1;
             }
 
