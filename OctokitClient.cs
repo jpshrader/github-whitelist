@@ -58,7 +58,7 @@ namespace github_whitelist {
             return (response, null);
         }
 
-        public async Task<ImmutableArray<string>> DeleteIpAllowListItems(IImmutableList<AllowedIp> allowList) {
+        public async Task<ImmutableArray<string>> DeleteIpAllowListItems(IEnumerable<AllowedIp> allowList) {
             var deletedIps = new List<string>();
             foreach(var allowListItem in allowList) {
                 var mutation = new Mutation().DeleteIpAllowListEntry(new DeleteIpAllowListEntryInput {
@@ -74,23 +74,23 @@ namespace github_whitelist {
             return [.. deletedIps];
         }
 
-        public async Task<ImmutableArray<Error>> AddIpAllowListItems(ID orgId, IImmutableList<AllowedIp> allowList) {
-            var errors = new List<Error>();
+        public async Task<ImmutableArray<string>> AddIpAllowListItems(ID orgId, IEnumerable<AllowedIp> allowList) {
+            var addedIps = new List<string>();
             foreach(var allowListItem in allowList) {
                 var mutation = new Mutation().CreateIpAllowListEntry(new CreateIpAllowListEntryInput {
                     OwnerId = orgId,
                     Name = allowListItem.Description,
                     AllowListValue = allowListItem.Cidr,
                     IsActive = allowListItem.IsActive,
+                }).Select(addedEntry => new {
+                    addedEntry.IpAllowListEntry.AllowListValue
                 });
 
                 var response = await graphQl.Run(mutation);
-                if (response is null) {
-                    errors.Add(new CoundNotCreateError("ip allow list", allowListItem.Cidr));
-                }
+                addedIps.Add(response.AllowListValue);
             }
 
-            return [.. errors];
+            return [.. addedIps];
         }
 
         public async Task<ID> GetOrgId(string orgSlug) {

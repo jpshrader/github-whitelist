@@ -51,17 +51,12 @@ namespace github_whitelist {
                 Description = ALLLOWLIST_DESC,
                 IsActive = true,
             }).ToImmutableArray();
-            // var addErrors = await client.AddIpAllowListItems(orgId, newAllowListItems);
-            // if (addErrors.Any()) {
-            //     foreach (var error in addErrors) {
-            //         var id = "N/A";
-            //         if (error is CoundNotCreateError err) {
-            //             id = err.Id;
-            //         }
-            //         Console.WriteLine($"unable to remove ip {id}: {error.Message}");
-            //     }
-            //     return -1;
-            // }
+            var addedIps = await client.AddIpAllowListItems(orgId, newAllowListItems);
+            var numFailedToCreate = newAllowListItems.Length - addedIps.Length;
+            if (numFailedToCreate > 0) {
+                Console.WriteLine($"failed to add {numFailedToCreate} managed entries");
+                return -1;
+            }
 
             var summaryTag = new string('=', 10);
             Console.WriteLine($"{summaryTag} SUMMARY {summaryTag}");
@@ -69,7 +64,8 @@ namespace github_whitelist {
             Console.WriteLine($"found {managedAllowListItems.Length} managed allow list entires");
             Console.WriteLine($"deleted {deletedItems.Length} managed allow list entires");
             Console.WriteLine($"found {nodes.Length} github action nodes");
-            Console.WriteLine($"added {newAllowListItems.Length} managed allow list entries");
+            Console.WriteLine($"attempted to add {newAllowListItems.Length} managed allow list entries");
+            Console.WriteLine($"added {addedIps.Length} managed allow list entries");
             return 0;
         }
     }
