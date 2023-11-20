@@ -58,23 +58,23 @@ namespace github_whitelist {
             return (response, null);
         }
 
-        public async Task<ImmutableArray<Error>> RemoveIpAllowList(IImmutableList<AllowedIp> allowList) {
-            var errors = new List<Error>();
+        public async Task<ImmutableArray<string>> DeleteIpAllowListItems(IImmutableList<AllowedIp> allowList) {
+            var deletedIps = new List<string>();
             foreach(var allowListItem in allowList) {
                 var mutation = new Mutation().DeleteIpAllowListEntry(new DeleteIpAllowListEntryInput {
                     IpAllowListEntryId = allowListItem.Id
+                }).Select(deletedEntry => new {
+                    deletedEntry.IpAllowListEntry.AllowListValue
                 });
 
                 var response = await graphQl.Run(mutation);
-                if (response is null) {
-                    errors.Add(new CoundNotDeleteError("ip allow list", allowListItem.Id.ToString()));
-                }
+                deletedIps.Add(response.AllowListValue);
             }
 
-            return [.. errors];
+            return [.. deletedIps];
         }
 
-        public async Task<ImmutableArray<Error>> AddIpAllowList(ID orgId, IImmutableList<AllowedIp> allowList) {
+        public async Task<ImmutableArray<Error>> AddIpAllowListItems(ID orgId, IImmutableList<AllowedIp> allowList) {
             var errors = new List<Error>();
             foreach(var allowListItem in allowList) {
                 var mutation = new Mutation().CreateIpAllowListEntry(new CreateIpAllowListEntryInput {
@@ -86,7 +86,7 @@ namespace github_whitelist {
 
                 var response = await graphQl.Run(mutation);
                 if (response is null) {
-                    errors.Add(new CoundNotDeleteError("ip allow list", allowListItem.Id.ToString()));
+                    errors.Add(new CoundNotCreateError("ip allow list", allowListItem.Cidr));
                 }
             }
 
@@ -103,7 +103,7 @@ namespace github_whitelist {
     }
 
     public class AllowedIp {
-        public required ID Id { get; set; }
+        public ID Id { get; set; }
 
         public required string Cidr { get; set; }
 
