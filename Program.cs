@@ -1,5 +1,9 @@
-﻿namespace github_whitelist {
+﻿using System.Collections.Immutable;
+
+namespace github_whitelist {
     class Program {
+        private const string ALLLOWLIST_DESC = "Managed by the GitHub Actions IP Whitelist";
+
         static async Task<int> Main(string[] args) {
             if (args.Length < 2) {
                 Console.WriteLine("must provide 2 arguments: <organization slug> <github api token>");
@@ -27,7 +31,6 @@
             }
 
             var orgId = await client.GetOrgId(orgSlug);
-            Console.WriteLine(orgId);
 
             var (allowList, ipListErr) = await client.GetIpAllowList(orgSlug);
             if (ipListErr is not null) {
@@ -35,8 +38,11 @@
                 return -1;
             }
 
+            var managedAllowListItems = allowList.Where(i => i.Description == ALLLOWLIST_DESC).ToImmutableArray();
+
             Console.WriteLine($"found {nodes.Length} github action nodes");
             Console.WriteLine($"found {allowList.Length} entires in the allow list");
+            Console.WriteLine($"found {managedAllowListItems.Length} managed allow list entires");
             return 0;
         }
     }

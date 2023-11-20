@@ -7,7 +7,6 @@ namespace github_whitelist {
     public class OctokitClient {
         private const string PRODUCT_NAME = "github-whitelist";
         private const string PRODUCT_VERSION = "0.1.0";
-        private const string ALLOWLIST_DESC = "Managed by the GitHub Actions IP Whitelist";
 
         private readonly GitHubClient rest;
         private readonly Octokit.GraphQL.Connection graphQl;
