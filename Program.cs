@@ -26,14 +26,17 @@
                 return -1;
             }
 
+            var orgId = await client.GetOrgId(orgSlug);
+            Console.WriteLine(orgId);
+
             var (allowList, ipListErr) = await client.GetIpAllowList(orgSlug);
             if (ipListErr is not null) {
                 Console.WriteLine(ipListErr);
                 return -1;
             }
 
-            Console.WriteLine($"found {nodes.Count} github action nodes");
-            Console.WriteLine($"found {allowList.Count} entires in the allow list");
+            Console.WriteLine($"found {nodes.Length} github action nodes");
+            Console.WriteLine($"found {allowList.Length} entires in the allow list");
             return 0;
         }
     }

@@ -10,4 +10,14 @@ namespace github_whitelist {
             return Message;
         }
     }
+
+    public class CoundNotDeleteError(string entityType, string id) : Error {
+        public override string Message => $"could not delete {entityType}: {id}";
+
+        public string Id => id;
+
+        public override string ToString() {
+            return Message;
+        }
+    }
 }
