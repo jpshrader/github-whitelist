@@ -29,16 +29,7 @@ namespace github_whitelist {
                 Console.WriteLine(ipListErr);
                 return -1;
             }
-
             var managedAllowListItems = allowList.Where(i => i.Description == ALLLOWLIST_DESC).ToImmutableArray();
-            var deletedItems = await client.DeleteIpAllowListItems(managedAllowListItems);
-            var numFailedToDelete = managedAllowListItems.Length - deletedItems.Length;
-            if (numFailedToDelete > 0) {
-                Console.WriteLine($"failed to delete {numFailedToDelete} managed entries");
-                return -1;
-            }
-
-            var orgId = await client.GetOrgId(orgSlug);
 
             var (nodes, nodeErr) = await client.GetGitHubActionNodes();
             if (nodeErr is not null) {
@@ -46,7 +37,23 @@ namespace github_whitelist {
                 return -1;
             }
 
-            var newAllowListItems = nodes.Select(n => new AllowedIp {
+            var managedItemsToDelete = managedAllowListItems
+                .Where(i => !nodes.Contains(i.Cidr))
+                .ToImmutableArray();
+            var deletedItems = await client.DeleteIpAllowListItems(managedItemsToDelete);
+            var numFailedToDelete = managedItemsToDelete.Length - deletedItems.Length;
+            if (numFailedToDelete > 0) {
+                Console.WriteLine($"failed to delete {numFailedToDelete} managed entries");
+                return -1;
+            }
+
+            var orgId = await client.GetOrgId(orgSlug);
+            var nodesToAdd = nodes
+                .Where(n => !managedAllowListItems
+                    .Select(i => i.Cidr)
+                    .Contains(n)
+                ).ToImmutableArray();
+            var newAllowListItems = nodesToAdd.Select(n => new AllowedIp {
                 Cidr = n,
                 Description = ALLLOWLIST_DESC,
                 IsActive = true,
@@ -62,9 +69,10 @@ namespace github_whitelist {
             Console.WriteLine($"{summaryTag} SUMMARY {summaryTag}");
             Console.WriteLine($"found {allowList.Length} entires in the allow list");
             Console.WriteLine($"found {managedAllowListItems.Length} managed allow list entires");
-            Console.WriteLine($"deleted {deletedItems.Length} managed allow list entires");
+            Console.WriteLine($"deleted {managedItemsToDelete.Length} managed allow list entires");
             Console.WriteLine($"found {nodes.Length} github action nodes");
             Console.WriteLine($"attempted to add {newAllowListItems.Length} managed allow list entries");
+            Console.WriteLine($"kept {nodes.Length - nodesToAdd.Length} managed allow list entries");
             Console.WriteLine($"added {addedIps.Length} managed allow list entries");
             return 0;
         }
