@@ -10,3 +10,10 @@ If you have an organization with an IP Whitelist gating your GitHub organization
 2. Have an automated way to identify and whitelist all IPs belonging to GitHub Action runner nodes, allowing these nodes to clone/interact with your repos.
 
 While `Option 1` is likely the _optimal_ solution, it incurs a lot of maintanence costs as you now have to maintain and pay for that node. `Option 2` will enable you to shield your code while granting access to verified GitHub resources, allowing your team to continue to lean on GitHub Actions for CI/CD builds.
+
+
+### Observations
+
+After completing the initial work of adding the node IPs (which was ~3800 as of December 2023), the week-to-week work was very minimal. Most of the time there are no changes, other times there are a maybe a dozen in total (nodes added/removed).
+
+From what I can see, this approach would absolutely serve as an adequate solution, especially if you're short on time.
