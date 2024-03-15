@@ -1,25 +1,25 @@
 {
-	"name": "github-whitelist",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			"VARIANT": "8.0-bookworm-slim",
-			"NODE_VERSION": "none"
-		}
-	},
-	"portsAttributes": {
-		"3000": {
-			"label": "github-whitelist",
-			"onAutoForward": "notify"
-		}
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"ms-dotnettools.csdevkit"
-			]
-		}
-	},
+    "name": "github-whitelist",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "VARIANT": "8.0-bookworm-slim",
+            "NODE_VERSION": "none"
+        }
+    },
+    "portsAttributes": {
+        "3000": {
+            "label": "github-whitelist",
+            "onAutoForward": "notify"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csdevkit"
+            ]
+        }
+    },
     "postCreateCommand": "",
-	"remoteUser": "vscode"
+    "remoteUser": "vscode"
 }
